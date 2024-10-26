@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>교회 검색</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>주차 배정 검색 시스템</h1>
+        <input type="text" id="searchInput" placeholder="교회명을 입력하세요">
+        <button onclick="searchChurch()">검색</button>
+        
+        <div id="results" class="results-container"></div>
+    </div>
+
+    <script>
+        async function searchChurch() {
+            const query = document.getElementById("searchInput").value;
+            const resultsDiv = document.getElementById("results");
+            resultsDiv.innerHTML = ''; // Clear previous results
+
+            if (!query) {
+                resultsDiv.innerHTML = "<p>검색어를 입력해주세요</p>";
+                return;
+            }
+
+            try {
+                const response = await fetch(`/search?name=${query}`);
+                if (!response.ok) {
+                    resultsDiv.innerHTML = "<p>검색된 교회가 없습니다</p>";
+                    return;
+                }
+
+                const results = await response.json();
+                results.forEach(item => {
+                    const churchInfo = `
+                        <div class="result-item">
+                            <h3>${item.교회명}</h3>
+                            <p><strong>위치:</strong> ${item.위치}</p>
+                            <p><strong>담당자:</strong> ${item.담당자}</p>
+                            <p><strong>연락처:</strong> ${item.연락처}</p>
+                            <p><strong>지역:</strong> ${item.지역}</p>
+                        </div>
+                    `;
+                    resultsDiv.innerHTML += churchInfo;
+                });
+            } catch (error) {
+                resultsDiv.innerHTML = "<p>검색 중 오류가 발생했습니다</p>";
+            }
+        }
+    </script>
+</body>
+</html>
